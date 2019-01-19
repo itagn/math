@@ -27,8 +27,8 @@ function intAdd(a = '0', b = '0') {
     const lenB = strB[0] === '-' ? strB.length - 1 : strB.length
     const maxLen = Math.max(lenA, lenB)
     const padLen = Math.ceil(maxLen / intLen) * intLen  // 即为会用到的整个数组长度
-    const newA = strA[0] === '-' ? `-${strA.slice(1).padStart(padLen, '0')}` : strA.padStart(padLen, '0')
-    const newB = strB[0] === '-' ? `-${strB.slice(1).padStart(padLen, '0')}` : strB.padStart(padLen, '0')
+    const newA = Number(a) < 0 ? `-${strA.slice(1).padStart(padLen, '0')}` : strA.padStart(padLen, '0')
+    const newB = Number(b) < 0 ? `-${strB.slice(1).padStart(padLen, '0')}` : strB.padStart(padLen, '0')
     let result = intCalc(newA, newB)
     // 去掉正负数前面无意义的字符 ‘0’
     const numberResult = Number(result)

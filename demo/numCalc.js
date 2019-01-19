@@ -17,7 +17,7 @@ function intAdd(a = '0', b = '0') {
     const intA = Number(a), intB = Number(b)
     if (intA === 0) return b
     if (intB === 0) return a
-    let newA, newB
+    let newA, newB, maxLen
     const strA = `${a}`, strB = `${b}`
     const reg = /^\-?(\d+)(\.\d+)?e\+(\d+)$/
     if(reg.test(a) || reg.test(b)) {
@@ -30,18 +30,15 @@ function intAdd(a = '0', b = '0') {
             const str = rest[2] ? rest[1] + rest[2].slice(1) : rest[1]
             return str.padEnd(Number(rest[3]) + 1, '0')
         })
-        const maxLen = Math.max(a.length, b.length)
-        const newLen = Math.ceil(maxLen / intLen) * intLen
-        newA = intA > 0 ? a.padStart(newLen, '0') : `-${a.padStart(newLen, '0')}`
-        newB = intB > 0 ? b.padStart(newLen, '0') : `-${b.padStart(newLen, '0')}`
+        maxLen = Math.max(a.length, b.length)
     } else {
         const lenA = strA[0] === '-' ? strA.length - 1 : strA.length
         const lenB = strB[0] === '-' ? strB.length - 1 : strB.length
-        const maxLen = Math.max(lenA, lenB)
-        const padLen = Math.ceil(maxLen / intLen) * intLen  // 即为会用到的整个数组长度
-        newA = strA[0] === '-' ? `-${strA.slice(1).padStart(padLen, '0')}` : strA.padStart(padLen, '0')
-        newB = strB[0] === '-' ? `-${strB.slice(1).padStart(padLen, '0')}` : strB.padStart(padLen, '0')
+        maxLen = Math.max(lenA, lenB)
     }
+    const padLen = Math.ceil(maxLen / intLen) * intLen  // 即为会用到的整个数组长度
+    newA = Number(a) < 0 ? `-${strA.slice(1).padStart(padLen, '0')}` : strA.padStart(padLen, '0')
+    newB = Number(b) < 0 ? `-${strB.slice(1).padStart(padLen, '0')}` : strB.padStart(padLen, '0')
     let result = intCalc(newA, newB)
     // 去掉正负数前面无意义的字符 ‘0’
     const numberResult = Number(result)

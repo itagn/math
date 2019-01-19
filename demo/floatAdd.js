@@ -22,7 +22,7 @@ function floatAdd(a = '0', b = '0') {
     newB = newB.padEnd(floatLen, '0')
     newA = strA[0][0] === '-' ? `-${newA}` : newA
     newB = strB[0][0] === '-' ? `-${newB}` : newB
-    let result = intCalc(newA, newB, false)
+    let result = intCalc(newA, newB)
     let tag = true, numResult = Number(result)
     // 去掉正负数后面无意义的字符 ‘0’
     if (numResult !== 0) {
@@ -50,58 +50,43 @@ function floatAdd(a = '0', b = '0') {
 * @param { boolean } isInt 是否为真的整数计算
 * @return { string } 返回相加的结果
 */
-function intCalc(a, b, isInt = true) {
-    let result = '0'
-    const intA = Number(a), intB = Number(b)
-    // 判断是否为安全数，不为安全数的操作进入复杂计算模式
-    if (isSafeNumber(intA) && isSafeNumber(intB) && isSafeNumber(intA + intB)) {
-        result = `${intA + intB}`
-    } else {
-        const sliceA = a.slice(1), sliceB = b.slice(1)
-        if(a[0] === '-' && b[0] === '-') {
-            // 两个数都为负数，取反后计算，结果再取反
-            result = '-' + calc(sliceA, sliceB, true)
-        } else if (a[0] === '-') {
-            // 第一个数为负数，第二个数为正数的情况
-            const newV = compareNumber(sliceA, b)
-            if (newV === 1) {
-                // 由于 a 的绝对值比 b 大，为了确保返回结果为正数，a的绝对值作为第一个参数
-                result = '-' + calc(sliceA, b, false)
-            } else if (newV === -1) {
-                // 道理同上
-                result = calc(b, sliceA, false)
-            }
-        } else if (b[0] === '-') {
-            // 第一个数为正数，第二个数为负数的情况
-            const newV = compareNumber(sliceB, a)
-            if (newV === 1) {
-                // 由于 b 的绝对值比 a 大，为了确保返回结果为正数，b的绝对值作为第一个参数
-                result = '-' + calc(sliceB, a, false)
-            } else if (newV === -1) {
-                // 道理同上
-                result = calc(a, sliceB, false)
-            }
-        } else {
-            // 两个数都为正数，直接计算
-            result = calc(a, b, true)
-        }
-    }
-    // 去掉正负数前面无意义的字符 ‘0’
-    if (isInt) {
-        const numberResult = Number(result)
-        if (numberResult > 0) {
-            while (result[0] === '0') {
-                result = result.slice(1)
-            }
-        } else if (numberResult < 0) {
-            while (result[1] === '0') {
-                result = '-' + result.slice(2)
-            }
-        } else {
-            result = '0'
-        }
-    }
-    return result
+function intCalc(a, b) {
+  let result = '0'
+  const intA = Number(a), intB = Number(b)
+  // 判断是否为安全数，不为安全数的操作进入复杂计算模式
+  if (isSafeNumber(intA) && isSafeNumber(intB) && isSafeNumber(intA + intB)) {
+      result = `${intA + intB}`
+  } else {
+      const sliceA = a.slice(1), sliceB = b.slice(1)
+      if(a[0] === '-' && b[0] === '-') {
+          // 两个数都为负数，取反后计算，结果再取反
+          result = '-' + calc(sliceA, sliceB, true)
+      } else if (a[0] === '-') {
+          // 第一个数为负数，第二个数为正数的情况
+          const newV = compareNumber(sliceA, b)
+          if (newV === 1) {
+              // 由于 a 的绝对值比 b 大，为了确保返回结果为正数，a的绝对值作为第一个参数
+              result = '-' + calc(sliceA, b, false)
+          } else if (newV === -1) {
+              // 道理同上
+              result = calc(b, sliceA, false)
+          }
+      } else if (b[0] === '-') {
+          // 第一个数为正数，第二个数为负数的情况
+          const newV = compareNumber(sliceB, a)
+          if (newV === 1) {
+              // 由于 b 的绝对值比 a 大，为了确保返回结果为正数，b的绝对值作为第一个参数
+              result = '-' + calc(sliceB, a, false)
+          } else if (newV === -1) {
+              // 道理同上
+              result = calc(a, sliceB, false)
+          }
+      } else {
+          // 两个数都为正数，直接计算
+          result = calc(a, b, true)
+      }
+  }
+  return result
 }
 
 

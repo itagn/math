@@ -4,75 +4,72 @@ const intLen = `${MAX}`.length - 1  // 下面会频繁用到的长度 15
 
 // 任意数加法函数入口
 function allAdd(a = '0', b = '0') {
-  const typeA = typeof(a), typeB = typeof(b)
-  const allowTypes = ['number', 'string']
-  if (!allowTypes.includes(typeA) || !allowTypes.includes(typeB)) {
-      console.error('参数中存在非法的数据，数据类型只支持 number 和 string')
-      return false
-  }
-  if (Number.isNaN(a) || Number.isNaN(b)) {
-      console.error('参数中不应该存在 NaN')
-      return false
-  }
-  const intA = Number(a), intB = Number(b)
-  if (intA === 0) return b
-  if (intB === 0) return a
-  const strA = `${a}`.split('.'), strB = `${b}`.split('.')
-  let intAs = strA[0], floatA = strA.length === 1 ? '0' : strA[1]
-  let intBs = strB[0], floatB = strB.length === 1 ? '0' : strB[1]
-  const tagA = intAs > 0, tagB = intBs > 0
-  const maxIntLen = Math.max(intAs.length, intBs.length)
-  const arrIntLen = Math.ceil(maxIntLen / intLen) * intLen
-  const maxFloatLen = Math.max(floatA.length, floatB.length)
-  const arrFloatLen = Math.ceil(maxFloatLen / intLen) * intLen
-  intAs = tagA ? intAs.padStart(arrIntLen, '0') : intAs.slice(1).padStart(arrIntLen, '0')
-  intBs = tagB ? intBs.padStart(arrIntLen, '0') : intBs.slice(1).padStart(arrIntLen, '0')
-  let newA = floatA === '0' ? intAs + '0'.padEnd(arrFloatLen, '0') : intAs + floatA.padEnd(arrFloatLen, '0')
-  let newB = floatB === '0' ? intBs + '0'.padEnd(arrFloatLen, '0') : intBs + floatB.padEnd(arrFloatLen, '0')
-  newA = tagA ? newA : `-${newA}`
-  newB = tagB ? newB : `-${newB}`
-  let result = intCalc(newA, newB)
-  const numResult = Number(result)
-  if (result.length > arrIntLen) {
-      result = result.slice(0, -arrFloatLen) + '.' + result.slice(-arrFloatLen)
-  }
-  // 去掉正负数前面后面无意义的字符 ‘0’
-  if (numResult !== 0) {
-      if (numResult > 0) {
-          while (result[0] === '0') {
-              result = result.slice(1)
-          }
-      } else if (numResult < 0) {
-          while (result[1] === '0') {
-              result = '-' + result.slice(2)
-          }
-          result = result.slice(1)
-          tag = false
-      }
-      let index = result.length - 1
-      while (result[index] === '0') {
-          result = result.slice(0, -1)
-          index--
-      }
-  } else {
-      result = '0'
-  }
-  if (result[result.length - 1] === '.') {
-    result = result.slice(0, -1)
-  }
-  if (result[0] === '.') {
-    result = '0' + result
-  }
-  console.log(result)
-  return result
+    const statusObj = checkNumber(a, b)
+    if (!statusObj.status) {
+        return statusObj.data
+    } else {
+        const strA = `${a}`.split('.'), strB = `${b}`.split('.')
+        let intAs = strA[0], floatA = strA.length === 1 ? '0' : strA[1]
+        let intBs = strB[0], floatB = strB.length === 1 ? '0' : strB[1]
+        const tagA = intAs > 0, tagB = intBs > 0
+        const maxIntLen = Math.max(intAs.length, intBs.length)
+        const arrIntLen = Math.ceil(maxIntLen / intLen) * intLen
+        const maxFloatLen = Math.max(floatA.length, floatB.length)
+        const arrFloatLen = Math.ceil(maxFloatLen / intLen) * intLen
+        intAs = tagA ? intAs.padStart(arrIntLen, '0') : intAs.slice(1).padStart(arrIntLen, '0')
+        intBs = tagB ? intBs.padStart(arrIntLen, '0') : intBs.slice(1).padStart(arrIntLen, '0')
+        let newA = floatA === '0' ? intAs + '0'.padEnd(arrFloatLen, '0') : intAs + floatA.padEnd(arrFloatLen, '0')
+        let newB = floatB === '0' ? intBs + '0'.padEnd(arrFloatLen, '0') : intBs + floatB.padEnd(arrFloatLen, '0')
+        newA = tagA ? newA : `-${newA}`
+        newB = tagB ? newB : `-${newB}`
+        let result = intCalc(newA, newB)
+        const numResult = Number(result)
+        if (result.length > arrIntLen) {
+            result = result.slice(0, -arrFloatLen) + '.' + result.slice(-arrFloatLen)
+        }
+        // 去掉正负数前面后面无意义的字符 ‘0’
+        if (numResult !== 0) {
+            if (numResult > 0) {
+                while (result[0] === '0') {
+                    result = result.slice(1)
+                }
+            } else if (numResult < 0) {
+                while (result[1] === '0') {
+                    result = '-' + result.slice(2)
+                }
+                result = result.slice(1)
+                tag = false
+            }
+            let index = result.length - 1
+            while (result[index] === '0') {
+                result = result.slice(0, -1)
+                index--
+            }
+        } else {
+            result = '0'
+        }
+        if (result[result.length - 1] === '.') {
+            result = result.slice(0, -1)
+        }
+        if (result[0] === '.') {
+            result = '0' + result
+        }
+        console.log(result)
+        return result
+    }
 }
 
 // 任意数减法函数入口
 function allSub(a = '0', b = '0') {
-  const newA = `${a}`
-  const newB = Number(b) > 0 ? `-${b}`: `${b}`.slice(1)
-  const result = allAdd(newA, newB)
-  return result
+    const newA = `${a}`
+    const newB = Number(b) > 0 ? `-${b}`: `${b}`.slice(1)
+    const statusObj = checkNumber(newA, newB)
+    if (!statusObj.status) {
+        return statusObj.data
+    } else {     
+        const result = allAdd(newA, newB)
+        return result
+    }
 }
 
 
@@ -174,6 +171,47 @@ function calc(a, b, type = true) {
 function isSafeNumber(num) {
     // 即使 num 成了科学计数法也能正确的和 MAX, MIN 比较大小
     return MIN <= num && num <= MAX
+}
+
+
+/**
+* @param { string } a 比较的第一个整数字符串
+* @param { string } b 比较的第二个整数字符串
+* @return { object } 返回是否要退出函数的状态和退出函数返回的数据
+*/
+function checkNumber(a, b) {
+    const obj = {
+        status: true,
+        data: null
+    }
+    const typeA = typeof(a), typeB = typeof(b)
+    const allowTypes = ['number', 'string']
+    if (!allowTypes.includes(typeA) || !allowTypes.includes(typeB)) {
+        console.error('参数中存在非法的数据，数据类型只支持 number 和 string')
+        obj.status = false
+        obj.data = false
+    }
+    if (Number.isNaN(a) || Number.isNaN(b)) {
+        console.error('参数中不应该存在 NaN')
+        obj.status = false
+        obj.data = false
+    }
+    const intA = Number(a), intB = Number(b)
+    if (intA === 0) {
+        obj.status = false
+        obj.data = b
+    }
+    if (intB === 0) {
+        obj.status = false
+        obj.data = a
+    }
+    const inf = [Infinity, -Infinity]
+    if (inf.includes(intA) || inf.includes(intB)) {
+        console.error('参数中存在Infinity或-Infinity')
+        obj.status = false
+        obj.data = false
+    }
+    return obj
 }
 
 

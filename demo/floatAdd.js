@@ -4,44 +4,39 @@ const intLen = `${MAX}`.length - 1  // 下面会频繁用到的长度 15
 
 // 小数加法函数入口
 function floatAdd(a = '0', b = '0') {
-    const typeA = typeof(a), typeB = typeof(b)
-    const allowTypes = ['number', 'string']
-    if (!allowTypes.includes(typeA) || !allowTypes.includes(typeB)) {
-        console.error('参数中存在非法的数据，数据类型只支持 number 和 string')
-        return false
-    }
-    if (Number.isNaN(a) || Number.isNaN(b)) {
-        console.error('参数中不应该存在 NaN')
-        return false
-    }
-    const strA = `${a}`.split('.'), strB = `${b}`.split('.')
-    let newA = strA[1], newB = strB[1]
-    const maxLen = Math.max(newA.length, newB.length)
-    const floatLen = Math.ceil(maxLen / intLen) * intLen
-    newA = newA.padEnd(floatLen, '0')
-    newB = newB.padEnd(floatLen, '0')
-    newA = strA[0][0] === '-' ? `-${newA}` : newA
-    newB = strB[0][0] === '-' ? `-${newB}` : newB
-    let result = intCalc(newA, newB)
-    let tag = true, numResult = Number(result)
-    // 去掉正负数后面无意义的字符 ‘0’
-    if (numResult !== 0) {
-        if (numResult < 0) {
-            result = result.slice(1)
-            tag = false
-        }
-        result = result.length === floatLen ? `0.${result}` : `1.${result.slice(1)}`
-        result = tag ? result : `-${result}`
-        let index = result.length - 1
-        while (result[index] === '0') {
-            result = result.slice(0, -1)
-            index--
-        }
+    const statusObj = checkNumber(a, b)
+    if (!statusObj.status) {
+        return statusObj.data
     } else {
-        result = '0'
+        const strA = `${a}`.split('.'), strB = `${b}`.split('.')
+        let newA = strA[1], newB = strB[1]
+        const maxLen = Math.max(newA.length, newB.length)
+        const floatLen = Math.ceil(maxLen / intLen) * intLen
+        newA = newA.padEnd(floatLen, '0')
+        newB = newB.padEnd(floatLen, '0')
+        newA = strA[0][0] === '-' ? `-${newA}` : newA
+        newB = strB[0][0] === '-' ? `-${newB}` : newB
+        let result = intCalc(newA, newB)
+        let tag = true, numResult = Number(result)
+        // 去掉正负数后面无意义的字符 ‘0’
+        if (numResult !== 0) {
+            if (numResult < 0) {
+                result = result.slice(1)
+                tag = false
+            }
+            result = result.length === floatLen ? `0.${result}` : `1.${result.slice(1)}`
+            result = tag ? result : `-${result}`
+            let index = result.length - 1
+            while (result[index] === '0') {
+                result = result.slice(0, -1)
+                index--
+            }
+        } else {
+            result = '0'
+        }
+        console.log(result)
+        return result
     }
-    console.log(result)
-    return result
 }
 
 /**
@@ -89,6 +84,45 @@ function intCalc(a, b) {
   return result
 }
 
+/**
+* @param { string } a 比较的第一个整数字符串
+* @param { string } b 比较的第二个整数字符串
+* @return { object } 返回是否要退出函数的状态和退出函数返回的数据
+*/
+function checkNumber(a, b) {
+    const obj = {
+        status: true,
+        data: null
+    }
+    const typeA = typeof(a), typeB = typeof(b)
+    const allowTypes = ['number', 'string']
+    if (!allowTypes.includes(typeA) || !allowTypes.includes(typeB)) {
+        console.error('参数中存在非法的数据，数据类型只支持 number 和 string')
+        obj.status = false
+        obj.data = false
+    }
+    if (Number.isNaN(a) || Number.isNaN(b)) {
+        console.error('参数中不应该存在 NaN')
+        obj.status = false
+        obj.data = false
+    }
+    const intA = Number(a), intB = Number(b)
+    if (intA === 0) {
+        obj.status = false
+        obj.data = b
+    }
+    if (intB === 0) {
+        obj.status = false
+        obj.data = a
+    }
+    const inf = [Infinity, -Infinity]
+    if (inf.includes(intA) || inf.includes(intB)) {
+        console.error('参数中存在Infinity或-Infinity')
+        obj.status = false
+        obj.data = false
+    }
+    return obj
+}
 
 /**
 * @param { string } a 相加的第一个整数字符串
